@@ -1,9 +1,8 @@
-import { test, expect } from '@playwright/test';
+import test, { expect } from "@playwright/test";
 
 test('test', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
   const page = await context.newPage();
-  
 
   await page.goto('https://snoonu.com/');
   await expect(page.getByRole('button', { name: 'icon Select Address' })).toBeVisible();
@@ -13,7 +12,10 @@ test('test', async ({ browser }) => {
   await page.locator('input[name="pin"]').click();
 
   const today = new Date();
-  const otp = today.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replaceAll('/', '');
+  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const year = String(today.getFullYear()).slice(-2);
+  const otp = `${day}${month}${year}`;
   const pinInput = await page.locator('input[name="pin"]');
   for (const char of otp) {
     await pinInput.press(char);
@@ -68,8 +70,5 @@ test('test', async ({ browser }) => {
   await expect(page.getByRole('heading', { name: 'Thank you for your feedback!' })).toBeVisible();
   await page.locator('#modal-root').getByRole('button', { name: 'OK' }).click();
   await context.close();
-});
-
-test.afterEach(async ({ browser }) => {
   await browser.close();
 });
