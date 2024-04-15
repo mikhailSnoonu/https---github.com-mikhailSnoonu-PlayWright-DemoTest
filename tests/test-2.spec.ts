@@ -3,6 +3,8 @@ import { test, expect } from '@playwright/test';
 test('test', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
   const page = await context.newPage();
+  page.setDefaultTimeout(60000);
+
   await page.goto('https://snoonu.com/');
   await expect(page.getByRole('button', { name: 'icon Select Address' })).toBeVisible();
   await page.getByRole('button', { name: 'Login' }).click();
