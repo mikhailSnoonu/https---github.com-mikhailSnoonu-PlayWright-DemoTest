@@ -15,7 +15,7 @@ test('test', async ({ browser }) => {
   const pinInput = await page.locator('input[name="pin"]');
   for (const char of otp) {
     await pinInput.press(char);
-    await page.waitForTimeout(200);
+    await page.waitForTimeout(100);
   }
 
   await page.waitForTimeout(3000);
@@ -25,7 +25,7 @@ test('test', async ({ browser }) => {
     await page.getByRole('button', { name: 'Continue' }).click();
     for (const char of otp) {
       await pinInput.press(char);
-      await page.waitForTimeout(200);
+      await page.waitForTimeout(100);
     }
   }
 
@@ -34,28 +34,25 @@ test('test', async ({ browser }) => {
   await page.getByRole('button', { name: 'Yes' }).click();
   await page.getByRole('link', { name: 'Food Food' }).click();
   await page.getByRole('link', { name: 'icon Free delivery Test Cafe' }).click();
+  await page.waitForTimeout(1000);
   await expect(page.locator('h1')).toContainText('Test Cafe Brand (Shouldn\'t CHANGE / CLOSE / DELETE)');
   await page.locator('div').filter({ hasText: /^1 QRSimple productAdd2 QRComplex Product1Add1 QRNew Complex Product1Add$/ }).getByRole('button').first().click();
   await page.getByRole('button', { name: 'icon 1 QR' }).click();
   await page.getByText('QRCheckout').click();
-
-  // Ждать появление элемента "Choose method"
-  await page.waitForTimeout(3000);
-  //await page.waitForSelector('#selectPaymentMethod', { timeout: 3000 });
- await page.locator('div').filter({ hasText: /^Choose method$/ }).click();
+  await page.waitForTimeout(5000);
+  await page.click('div[data-analytic-label="selectPaymentMethod"]');
   await page.locator('label:has-text("Cash")').click();
   await page.getByRole('button', { name: 'Done' }).click();
   await page.getByRole('button', { name: 'Place order' }).click();
+  await page.waitForTimeout(2000);
+  await page.waitForSelector('button', { name: 'Cancel Order' });
+  const cancelButton = await page.waitForSelector('button', { name: 'Cancel Order' });
+  await cancelButton.click();
 
-  // Ждать появление кнопки "Cancel Order"
-  await page.waitForSelector('button:has-text("Cancel Order")');
-  await page.getByRole('button', { name: 'Cancel Order' }).click();
-
-  // Ждать появление кнопки "Cancel Order" внутри модального окна
   await page.waitForSelector('#modalContent button:has-text("Cancel Order")');
   await page.locator('#modalContent button:has-text("Cancel Order")').click();
-
-  await page.getByRole('button', { name: 'Done' }).click();
+  await page.waitForSelector('#modal-root button:has-text("OK")');
+  await page.locator('#modal-root button:has-text("OK")').click();
   await context.close();
 });
 
